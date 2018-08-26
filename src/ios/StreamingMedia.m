@@ -24,6 +24,7 @@
     UIImageView *imageView;
     BOOL initFullscreen;
     NSString *mOrientation;
+    NSString *videoType;
 }
 
 NSString * const TYPE_VIDEO = @"VIDEO";
@@ -52,6 +53,8 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     }
     
     if ([type isEqualToString:TYPE_AUDIO]) {
+        videoType = TYPE_AUDIO;
+        
         // bgImage
         // bgImageScale
         if (![options isKindOfClass:[NSNull class]] && [options objectForKey:@"bgImage"]) {
@@ -194,7 +197,7 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     
     [moviePlayer setPlayer:movie];
     [moviePlayer setShowsPlaybackControls:YES];
-    if(@available(iOS 11.0, *)) { [moviePlayer setEntersFullScreenWhenPlaybackBegins:YES]; }
+    //if(@available(iOS 11.0, *)) { [moviePlayer setEntersFullScreenWhenPlaybackBegins:YES]; }
     
     //present modally so we get a close button
     [self.viewController presentViewController:moviePlayer animated:YES completion:^(void){
@@ -214,13 +217,14 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
                                                  name:AVPlayerItemFailedToPlayToEndTimeNotification
                                                object:moviePlayer.player.currentItem];
     
-    
-    if (imageView != nil) {
-        [moviePlayer.contentOverlayView setAutoresizesSubviews:YES];
-        [moviePlayer.contentOverlayView addSubview:imageView];
+    if ([videoType isEqualToString:TYPE_AUDIO]) {
+        if (imageView != nil) {
+            [moviePlayer.contentOverlayView setAutoresizesSubviews:YES];
+            [moviePlayer.contentOverlayView addSubview:imageView];
+        }
+        moviePlayer.contentOverlayView.backgroundColor = backgroundColor;
+        [self.viewController.view addSubview:moviePlayer.view];
     }
-    moviePlayer.contentOverlayView.backgroundColor = backgroundColor;
-    [self.viewController.view addSubview:moviePlayer.view];
     
     // Listen for click on the "Done" button
     
